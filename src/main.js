@@ -6,6 +6,8 @@ import { createPinia } from 'pinia'
 import router from './router'
 import App from './App.vue'
 import './styles/main.scss'
+import VueECharts from 'vue-echarts'
+import 'echarts'
 
 const app = createApp(App)
 
@@ -14,6 +16,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
+app.component('v-chart', VueECharts)
 app.use(ElementPlus)
 app.use(createPinia())
 app.use(router)
