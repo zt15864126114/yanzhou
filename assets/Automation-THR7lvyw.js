@@ -1,0 +1,1 @@
+import{_ as t,c as a,a as o,b as c,w as s,r as n,o as r,d as _}from"./index-WzB_gntL.js";const d={},l={class:"page-container"},i=o("div",{class:"page-title"},"自动运维",-1);function p(f,m){const e=n("el-card");return r(),a("div",l,[i,c(e,null,{default:s(()=>[_("这里是自动运维页面。")]),_:1})])}const x=t(d,[["render",p]]);export{x as default};

@@ -1,1 +1,0 @@
-import{_ as t,c as a,a as c,b as o,w as s,r as n,o as r,d as _}from"./index-HaA-2zTx.js";const d={},l={class:"page-container"},i=c("div",{class:"page-title"},"备份管理",-1);function p(f,m){const e=n("el-card");return r(),a("div",l,[i,o(e,null,{default:s(()=>[_("这里是备份管理页面。")]),_:1})])}const x=t(d,[["render",p]]);export{x as default};

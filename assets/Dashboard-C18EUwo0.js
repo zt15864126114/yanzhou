@@ -1,1 +1,0 @@
-import{_ as a,c as t,a as o,b as s,w as c,r as n,o as r,d as _}from"./index-HaA-2zTx.js";const d={},l={class:"page-container"},i=o("div",{class:"page-title"},"仪表盘",-1);function p(f,m){const e=n("el-card");return r(),t("div",l,[i,s(e,null,{default:c(()=>[_("欢迎使用超融合管理平台！")]),_:1})])}const u=a(d,[["render",p]]);export{u as default};

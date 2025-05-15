@@ -1,1 +1,0 @@
-import{_ as t,c as a,a as o,b as c,w as s,r as n,o as r,d as _}from"./index-HaA-2zTx.js";const d={},i={class:"page-container"},l=o("div",{class:"page-title"},"消息中心",-1);function f(p,m){const e=n("el-card");return r(),a("div",i,[l,c(e,null,{default:s(()=>[_("这里是消息中心页面。")]),_:1})])}const x=t(d,[["render",f]]);export{x as default};

@@ -1,0 +1,1 @@
+import{_ as t,c as a,a as s,b as c,w as o,r as n,o as r,d as _}from"./index-WzB_gntL.js";const d={},l={class:"page-container"},i=s("div",{class:"page-title"},"系统设置",-1);function p(f,m){const e=n("el-card");return r(),a("div",l,[i,c(e,null,{default:o(()=>[_("这里是系统设置页面。")]),_:1})])}const x=t(d,[["render",p]]);export{x as default};
