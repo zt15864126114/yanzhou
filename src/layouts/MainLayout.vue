@@ -1,9 +1,10 @@
 <template>
   <el-container class="layout-container">
+    <!-- 侧边栏 -->
     <el-aside width="200px">
       <div class="logo">
-        <el-icon :size="32" color="#409EFF"><Monitor /></el-icon>
-        <span>超融合管理平台</span>
+        <img src="../assets/logo.png" alt="Logo">
+        <span>管理系统</span>
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -13,73 +14,85 @@
       >
         <el-menu-item index="/">
           <el-icon><Monitor /></el-icon>
-          <template #title>仪表盘</template>
+          <span>仪表盘</span>
         </el-menu-item>
-        <el-menu-item index="/monitoring">
+
+        <!-- 用户管理 -->
+        <el-sub-menu index="user">
+          <template #title>
+            <el-icon><User /></el-icon>
+            <span>用户管理</span>
+          </template>
+          <el-menu-item index="/profile">个人信息</el-menu-item>
+          <el-menu-item v-if="isAdmin" index="/users">用户列表</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 设备管理 -->
+        <el-sub-menu index="device">
+          <template #title>
+            <el-icon><Connection /></el-icon>
+            <span>设备管理</span>
+          </template>
+          <el-menu-item index="/devices">网络设备</el-menu-item>
+          <el-menu-item index="/servers">服务器</el-menu-item>
+          <el-menu-item index="/storage">存储设备</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 资源管理 -->
+        <el-menu-item index="/resources">
+          <el-icon><Cpu /></el-icon>
+          <span>资源管理</span>
+        </el-menu-item>
+
+        <!-- 数据服务 -->
+        <el-menu-item index="/data">
           <el-icon><DataLine /></el-icon>
-          <template #title>资源监控</template>
+          <span>数据服务</span>
         </el-menu-item>
-        <el-menu-item index="/backup">
-          <el-icon><Upload /></el-icon>
-          <template #title>备份管理</template>
-        </el-menu-item>
-        <el-menu-item index="/tenants">
-          <el-icon><OfficeBuilding /></el-icon>
-          <template #title>租户管理</template>
-        </el-menu-item>
-        <el-menu-item index="/settings">
-          <el-icon><Setting /></el-icon>
-          <template #title>系统设置</template>
-        </el-menu-item>
-        <el-menu-item index="/automation">
-          <el-icon><Tools /></el-icon>
-          <template #title>自动运维</template>
-        </el-menu-item>
-        <el-menu-item index="/system-health">
-          <el-icon><StarFilled /></el-icon>
-          <template #title>系统健康</template>
-        </el-menu-item>
-        <el-menu-item index="/audit-log">
-          <el-icon><Document /></el-icon>
-          <template #title>操作日志</template>
-        </el-menu-item>
-        <el-menu-item index="/notification-center">
-          <el-icon><BellFilled /></el-icon>
-          <template #title>消息中心</template>
-        </el-menu-item>
-        <el-menu-item index="/recycle-bin">
-          <el-icon><DeleteFilled /></el-icon>
-          <template #title>资源回收站</template>
-        </el-menu-item>
+
+        <!-- 监控告警 -->
+        <el-sub-menu index="monitor">
+          <template #title>
+            <el-icon><Warning /></el-icon>
+            <span>监控告警</span>
+          </template>
+          <el-menu-item index="/monitoring">系统监控</el-menu-item>
+          <el-menu-item index="/alerts">告警管理</el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
+
+    <!-- 主要内容区 -->
     <el-container>
+      <!-- 顶部栏 -->
       <el-header>
         <div class="header-left">
-          <el-icon class="collapse-btn" @click="toggleCollapse">
-            <component :is="isCollapse ? 'Expand' : 'Fold'" />
-          </el-icon>
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item>{{ currentRoute }}</el-breadcrumb-item>
+          <el-button type="text" @click="toggleCollapse">
+            <el-icon><Fold v-if="!isCollapse" /><Expand v-else /></el-icon>
+          </el-button>
+          <el-breadcrumb>
+            <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.path" :to="item.path">
+              {{ item.title }}
+            </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="header-right">
-          <el-dropdown>
+          <el-dropdown @command="handleCommand">
             <span class="user-info">
-              <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-              <span>管理员</span>
+              {{ username }}
+              <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人信息</el-dropdown-item>
-                <el-dropdown-item>修改密码</el-dropdown-item>
-                <el-dropdown-item divided>退出登录</el-dropdown-item>
+                <el-dropdown-item command="profile">个人信息</el-dropdown-item>
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
       </el-header>
+
+      <!-- 内容区 -->
       <el-main>
         <router-view />
       </el-main>
@@ -89,121 +102,132 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import {
+  Monitor,
+  User,
+  Connection,
+  Cpu,
+  DataLine,
+  Warning,
+  Fold,
+  Expand,
+  ArrowDown
+} from '@element-plus/icons-vue'
 
+const router = useRouter()
 const route = useRoute()
 const isCollapse = ref(false)
+const username = ref(localStorage.getItem('username') || '用户')
 
+// 计算当前激活的菜单
 const activeMenu = computed(() => route.path)
-const currentRoute = computed(() => route.meta.title || '')
 
+// 判断是否为管理员
+const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin')
+
+// 面包屑导航
+const breadcrumbs = computed(() => {
+  const matched = route.matched.filter(item => item.meta && item.meta.title)
+  return matched.map(item => ({
+    title: item.meta.title,
+    path: item.path
+  }))
+})
+
+// 切换侧边栏折叠状态
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
 }
+
+// 处理用户下拉菜单命令
+const handleCommand = (command) => {
+  switch (command) {
+    case 'profile':
+      router.push('/profile')
+      break
+    case 'logout':
+      ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('userRole')
+        localStorage.removeItem('username')
+        router.push('/login')
+      })
+      break
+  }
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .layout-container {
   height: 100vh;
-  
-  .el-aside {
-    background-color: #304156;
-    color: #fff;
-    
-    .logo {
-      height: 60px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      background-color: #2b3649;
-      
-      .el-icon {
-        margin-right: 12px;
-      }
-      
-      span {
-        font-size: 16px;
-        font-weight: bold;
-        white-space: nowrap;
-      }
-    }
-    
-    .el-menu {
-      background-color: transparent;
-      border-right: none;
-      
-      :deep(.el-menu-item) {
-        color: #e0e6ed;
-        font-size: 16px;
-        font-weight: 500;
-        transition: background 0.2s, color 0.2s;
-        
-        .el-icon {
-          color: #bfcbd9;
-          transition: color 0.2s;
-        }
-        
-        &.is-active {
-          background-color: #1e2b3a !important;
-          color: #ffffff !important;
-          font-weight: bold;
-          
-          .el-icon {
-            color: #409EFF !important;
-          }
-        }
-        
-        &:hover {
-          background-color: #22304a !important;
-          color: #fff !important;
-          
-          .el-icon {
-            color: #409EFF !important;
-          }
-        }
-      }
-    }
-  }
-  
-  .el-header {
-    background-color: #fff;
-    border-bottom: 1px solid #e6e6e6;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-      
-      .collapse-btn {
-        font-size: 20px;
-        cursor: pointer;
-        margin-right: 20px;
-        
-        &:hover {
-          color: #409EFF;
-        }
-      }
-    }
-    
-    .header-right {
-      .user-info {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        
-        span {
-          margin-left: 8px;
-        }
-      }
-    }
-  }
-  
-  .el-main {
-    background-color: #f0f2f5;
-    padding: 20px;
-  }
+}
+
+.el-aside {
+  background-color: #304156;
+  color: #fff;
+}
+
+.logo {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #2b2f3a;
+}
+
+.logo img {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.logo span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.el-menu {
+  border-right: none;
+}
+
+.el-header {
+  background-color: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #606266;
+}
+
+.user-info .el-icon {
+  margin-left: 4px;
+}
+
+.el-main {
+  background-color: #f0f2f5;
+  padding: 20px;
 }
 </style> 

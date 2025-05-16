@@ -9,14 +9,15 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "vue": "3.3.4",
+    "@element-plus/icons-vue": "2.1.0",
+    "axios": "1.4.0",
+    "echarts": "5.4.3",
     "element-plus": "2.4.4",
     "pinia": "2.1.7",
-    "vue-router": "4.2.5",
+    "vue": "3.3.4",
     "vue-echarts": "6.6.1",
-    "echarts": "5.4.3",
-    "@element-plus/icons-vue": "2.1.0",
-    "axios": "1.4.0"
+    "vue-router": "4.2.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "4.5.2",
@@ -24,4 +25,4 @@
     "sass": "1.71.1",
     "vite": "5.0.12"
   }
-} 
+}

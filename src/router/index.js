@@ -1,78 +1,113 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import Layout from '../layouts/MainLayout.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
     path: '/',
-    component: Layout,
+    component: () => import('../layouts/MainLayout.vue'),
     children: [
       {
         path: '',
         name: 'Dashboard',
         component: () => import('../views/Dashboard.vue'),
-        meta: { title: '仪表盘' }
+        meta: { requiresAuth: true }
       },
+      // 用户管理模块
+      {
+        path: 'users',
+        name: 'UserManagement',
+        component: () => import('../views/user/UserManagement.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../views/user/Profile.vue'),
+        meta: { requiresAuth: true }
+      },
+      // 设备管理模块
+      {
+        path: 'devices',
+        name: 'DeviceManagement',
+        component: () => import('../views/device/DeviceManagement.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'servers',
+        name: 'ServerManagement',
+        component: () => import('../views/device/ServerManagement.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'storage',
+        name: 'StorageManagement',
+        component: () => import('../views/device/StorageManagement.vue'),
+        meta: { requiresAuth: true }
+      },
+      // 资源管理模块
+      {
+        path: 'resources',
+        name: 'ResourceManagement',
+        component: () => import('../views/resource/ResourceManagement.vue'),
+        meta: { requiresAuth: true }
+      },
+      // 数据服务模块
+      {
+        path: 'data',
+        name: 'DataService',
+        component: () => import('../views/data/DataService.vue'),
+        meta: { requiresAuth: true }
+      },
+      // 监控与告警模块
       {
         path: 'monitoring',
         name: 'Monitoring',
-        component: () => import('../views/Monitoring.vue'),
-        meta: { title: '资源监控' }
+        component: () => import('../views/monitoring/Monitoring.vue'),
+        meta: { requiresAuth: true }
       },
       {
-        path: 'backup',
-        name: 'Backup',
-        component: () => import('../views/Backup.vue'),
-        meta: { title: '备份管理' }
-      },
-      {
-        path: 'settings',
-        name: 'Settings',
-        component: () => import('../views/Settings.vue'),
-        meta: { title: '系统设置' }
-      },
-      {
-        path: 'tenants',
-        name: 'Tenants',
-        component: () => import('../views/Tenants.vue'),
-        meta: { title: '租户管理' }
-      },
-      {
-        path: 'automation',
-        name: 'Automation',
-        component: () => import('../views/Automation.vue'),
-        meta: { title: '自动运维' }
-      },
-      {
-        path: 'system-health',
-        name: 'SystemHealth',
-        component: () => import('../views/SystemHealth.vue'),
-        meta: { title: '系统健康' }
-      },
-      {
-        path: 'audit-log',
-        name: 'AuditLog',
-        component: () => import('../views/AuditLog.vue'),
-        meta: { title: '操作日志' }
-      },
-      {
-        path: 'notification-center',
-        name: 'NotificationCenter',
-        component: () => import('../views/NotificationCenter.vue'),
-        meta: { title: '消息中心' }
-      },
-      {
-        path: 'recycle-bin',
-        name: 'RecycleBin',
-        component: () => import('../views/RecycleBin.vue'),
-        meta: { title: '资源回收站' }
+        path: 'alerts',
+        name: 'Alerts',
+        component: () => import('../views/monitoring/Alerts.vue'),
+        meta: { requiresAuth: true }
       }
     ]
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/auth/Login.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/auth/Register.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFound.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+  const userRole = localStorage.getItem('userRole')
+  
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    next({ name: 'Login' })
+  } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+    next({ name: 'Dashboard' })
+  } else {
+    next()
+  }
 })
 
 export default router 
